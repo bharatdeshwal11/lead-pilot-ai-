@@ -1,0 +1,12 @@
+.git
+**/node_modules
+**/dist
+**/target
+**/coverage
+**/test-results
+**/playwright-report
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+docs

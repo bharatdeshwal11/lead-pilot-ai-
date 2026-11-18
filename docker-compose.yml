@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-leadpilot}
+      POSTGRES_USER: ${DB_USERNAME:-leadpilot}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Copy .env.example to .env and configure DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [database]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME:-leadpilot}
+      DB_USERNAME: ${DB_USERNAME:-leadpilot}
+      DB_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD in .env}
+      APP_SECURE_COOKIES: ${APP_SECURE_COOKIES:-false}
+      APP_FORWARD_HEADERS: framework
+      APP_ALLOWED_ORIGINS: ${APP_ALLOWED_ORIGINS:-}
+      APP_DEMO_SEED: ${APP_DEMO_SEED:-false}
+      APP_DEMO_ADMIN_EMAIL: ${APP_DEMO_ADMIN_EMAIL:-}
+      APP_DEMO_ADMIN_PASSWORD: ${APP_DEMO_ADMIN_PASSWORD:-}
+      APP_DEMO_AGENT_EMAIL: ${APP_DEMO_AGENT_EMAIL:-}
+      APP_DEMO_AGENT_PASSWORD: ${APP_DEMO_AGENT_PASSWORD:-}
+      APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL:-}
+      APP_BOOTSTRAP_ADMIN_PASSWORD: ${APP_BOOTSTRAP_ADMIN_PASSWORD:-}
+      APP_OPENAPI_ENABLED: ${APP_OPENAPI_ENABLED:-true}
+      APP_LOGIN_LIMIT: ${APP_LOGIN_LIMIT:-12}
+      APP_AI_LIMIT: ${APP_AI_LIMIT:-12}
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+    networks: [app, database]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 4s
+      start_period: 25s
+      retries: 12
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:80"
+    networks: [app]
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  app:
+  database:
+    internal: true
+
+volumes:
+  postgres_data:

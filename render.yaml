@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: leadpilot-ai
+    runtime: docker
+    region: oregon
+    plan: 0.5c-512mb
+    dockerfilePath: ./Dockerfile.deploy
+    healthCheckPath: /health
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: APP_SECURE_COOKIES
+        value: "true"
+      - key: APP_FORWARD_HEADERS
+        value: framework
+      - key: APP_DEMO_SEED
+        value: "false"
+      - key: APP_OPENAPI_ENABLED
+        value: "false"
+      - key: AI_PROVIDER
+        value: mock
+      - key: RENDER_DATABASE_URL
+        fromDatabase:
+          name: leadpilot-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: leadpilot-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: leadpilot-db
+          property: password
+      - key: APP_BOOTSTRAP_ADMIN_EMAIL
+        sync: false
+      - key: APP_BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+
+databases:
+  - name: leadpilot-db
+    region: oregon
+    plan: 0.1c-256mb
+    diskSizeGB: 1
+    postgresMajorVersion: "17"
+    ipAllowList: []

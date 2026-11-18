@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: leadpilot-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/leadpilot}
+    username: ${DB_USERNAME:leadpilot}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    clean-disabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: ${APP_FORWARD_HEADERS:none}
+  error:
+    include-exception: false
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+  servlet:
+    session:
+      timeout: 30m
+      tracking-modes: cookie
+      cookie:
+        name: LEADPILOT_SESSION
+        http-only: true
+        secure: ${APP_SECURE_COOKIES:true}
+        same-site: lax
+springdoc:
+  api-docs:
+    enabled: ${APP_OPENAPI_ENABLED:true}
+  swagger-ui:
+    enabled: ${APP_OPENAPI_ENABLED:true}
+leadpilot:
+  security:
+    allowed-origins: ${APP_ALLOWED_ORIGINS:}
+    login-limit: ${APP_LOGIN_LIMIT:12}
+    ai-limit: ${APP_AI_LIMIT:12}
+  demo:
+    enabled: ${APP_DEMO_SEED:false}
+    admin-email: ${APP_DEMO_ADMIN_EMAIL:}
+    admin-password: ${APP_DEMO_ADMIN_PASSWORD:}
+    agent-email: ${APP_DEMO_AGENT_EMAIL:}
+    agent-password: ${APP_DEMO_AGENT_PASSWORD:}
+  bootstrap:
+    email: ${APP_BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${APP_BOOTSTRAP_ADMIN_PASSWORD:}
+  ai:
+    provider: ${AI_PROVIDER:mock}
+    api-key: ${OPENAI_API_KEY:}
+    model: ${OPENAI_MODEL:gpt-4.1-mini}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+    connect-timeout: ${OPENAI_CONNECT_TIMEOUT:5s}
+    request-timeout: ${OPENAI_REQUEST_TIMEOUT:20s}
+logging:
+  level:
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: "OFF"

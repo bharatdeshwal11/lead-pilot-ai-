@@ -11,7 +11,7 @@ RUN ./mvnw -B -ntp -Dmaven.test.skip=true package && rm -rf /root/.m2
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-RUN addgroup -S leadpilot && adduser -S -G leadpilot leadpilot
+RUN chmod 755 /app && addgroup -S leadpilot && adduser -S -G leadpilot leadpilot
 COPY --chmod=444 --from=backend /app/target/leadpilot-api-1.0.0.jar app.jar
 COPY --chmod=755 deployment/start.sh start.sh
 USER leadpilot

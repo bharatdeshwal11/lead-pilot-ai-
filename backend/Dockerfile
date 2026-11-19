@@ -5,7 +5,7 @@ RUN --mount=type=bind,target=/source \
     cp target/leadpilot-api-1.0.0.jar /app.jar && rm -rf /tmp/leadpilot /root/.m2
 
 FROM eclipse-temurin:21-jre-alpine
-COPY --chmod=444 --from=build /app.jar /app/app.jar
+COPY --chmod=444 --from=build /app.jar /leadpilot-api.jar
 USER 10001:10001
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/leadpilot-api.jar"]
